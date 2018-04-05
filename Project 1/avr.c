@@ -33,7 +33,7 @@ int main (void)
 
   while (1)
   {
-    if(!GET_BIT(PINA, 0))
+    if(!GET_BIT(PINA, 0)) //If last bit A0 != 0
     {  
       //Light up the LED
       SET_BIT(PORTB, 0);
