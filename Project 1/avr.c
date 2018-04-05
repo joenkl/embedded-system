@@ -1,12 +1,21 @@
+#include <avr/io.h>
 #include "avr.h"
 
-void
-ini_avr(void)
+
+#define WAIT 500
+void ini_avr(void)
 {
+  //Define PORTA and input
+  PORTA = 0x00;
+  DDRA = 0x00;
+
+  //Define PORTB and output
+  PORTB = 0x00;
+  DDRB = 0x01;
+
 }
 
-void
-wait_avr(unsigned short msec)
+void wait_avr(unsigned short msec)
 {
   TCCR0 = 3;
   while (msec--) {
@@ -15,4 +24,22 @@ wait_avr(unsigned short msec)
     while (!GET_BIT(TIFR, TOV0));
   }
   TCCR0 = 0;
+}
+
+int main (void)
+{
+  //init
+  ini_avr();
+
+  while (1)
+  {
+    if(!GET_BIT(PINA, 0))
+    {  
+      //Light up the LED
+      SET_BIT(PORTB, 0);
+      wait_avr(WAIT);
+      CLR_BIT(PORTB, 0);
+      wait_avr(WAIT);
+    }   
+  }
 }
