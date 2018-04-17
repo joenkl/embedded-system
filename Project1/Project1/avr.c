@@ -4,14 +4,8 @@
 #define WAITTIME 500
 void ini_avr(void)
 {
-	//Define PORTB_1 and input
-	PORTB = 0x01;
-	DDRB = 0x00;
-
-	//Define PORTB_0 and output
-	PORTB = 0x00;
-	DDRB = 0x01;
-
+	SET_BIT(DDRB, 0);
+	CLR_BIT(DDRB, 1);
 }
 
 void wait_avr(unsigned short msec)
@@ -51,13 +45,14 @@ int main (void)
 		
 		//Blinking LED with EXTERNAL CRYSTAL
 		//Using: Medium Freq: Start-up time: 16 CK + 64ms
-		if (!GET_BIT(PINB, 1)){
+		if (!GET_BIT(PINB, 1))
+		{
 			SET_BIT(PORTB, 0);
 			wait_avr(WAITTIME);
 			CLR_BIT(PORTB, 0);
 			wait_avr(WAITTIME);
-			}else{
-			CLR_BIT(PORTB, 0);
 		}
+		else
+			CLR_BIT(PORTB, 0);
 	}
 }
