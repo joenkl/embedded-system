@@ -41,7 +41,7 @@ int main (void)
 			wait_avr(WAITTIME);
 		}
 		else
-		CLR_BIT(PORTB, 0);
+			CLR_BIT(PORTB, 0);
 		
 		//BLinking LED Without external crystal
 		/*if (!GET_BIT(PINB,1)){
