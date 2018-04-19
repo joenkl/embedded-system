@@ -10,48 +10,10 @@
 
 
 unsigned int is_pressed(int r, int c){
-	switch(r){
-		case 0:
-		CLR_BIT(PORTC, 0);
-		break;
-		case 1:
-		CLR_BIT(PORTC, 1);
-		break;
-		case 2:
-		CLR_BIT(PORTC, 2);
-		break;
-		case 3:
-		CLR_BIT(PORTC, 3);
-		break;
-	}
-	
-	switch(c){
-		case 0:
-		if(GET_BIT(PINC, 4))
-		return 0;
-		else
+	if (!GET_BIT(PINC, c))
 		return 1;
-		break;
-		case 1:
-		if(GET_BIT(PINC, 5))
+	else
 		return 0;
-		else
-		return 1;
-		break;
-		case 2:
-		if(GET_BIT(PINC, 6))
-		return 0;
-		else
-		return 1;
-		break;
-		case 3:
-		if(GET_BIT(PINC, 7))
-		return 0;
-		else
-		return 1;
-		break;
-	}
-	return 0;
 }
 
 unsigned int get_key(){
@@ -68,16 +30,19 @@ unsigned int get_key(){
 
 int main(void)
 {
-	DDRC = 0xF0; //set C0-3 input, C4-7 output
-	
+	DDRC = 0xF0; //set C0-3 input(column), C4-7 output(row)
+	PORTC = 0x0F; //set C0-3 to high(column), C4-7 to low(row)
 	DDRB = 0x08; //set B3 output
 	
 	/* Replace with your application code */
 	while (1)
 	{
-		int num = get_key();
-		if(num){
+		volatile int num = get_key();
+		if(num != 0){
 			SET_BIT(PORTB, 3);
+			wait_avr(250);
+			CLR_BIT(PORTB, 3);
+			wait_avr(250);
 		} else 
 			CLR_BIT(PORTB, 3);
 	}
