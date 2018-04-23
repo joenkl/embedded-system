@@ -110,11 +110,9 @@ unsigned int get_key()
 
 char isLeapYear()
 {
-	if (YYYY % 4 == 0)
-		if (YYYY % 100 == 0)
-			if (YYYY % 400 == 0)
-				return 1; /* true */
-	return 0;				/* false */
+	return ((YYYY % 4 == 0 && YYYY % 100 != 0) || (YYYY % 400 == 0))
+						 ? 1 /* true*/
+						 : 0 /* false */;
 }
 
 void increaseDay()
