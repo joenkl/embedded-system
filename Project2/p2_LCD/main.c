@@ -165,6 +165,39 @@ void increaseTime()
 	}
 }
 
+char setDay(char day, char month, char year)
+{
+	if (month > 12 || month == 0 || year == 0 || day == 0)
+		return 0; //Error
+
+	if (day > days_of_month[month])
+		if (month != 2)
+			return 0; //need to check for leap year
+		else
+		{
+			if (isLeapYear() && day > 29)
+				return 0;
+			if (!isLeapYear())
+				return 0;
+		}
+
+	DD = day;
+	MM = month;
+	YYYY = year;
+	return 1;
+}
+
+char setTime(char hour, char minute, char second)
+{
+	if (hour > 23 || minute > 59 || second > 59)
+		return 0;
+
+	h = hour;
+	m = minute;
+	s = second;
+	return 1;
+}
+
 int main(void)
 {
 	DDRB = 0x08; //set B3 output
