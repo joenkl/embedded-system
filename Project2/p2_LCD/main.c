@@ -1,60 +1,169 @@
 /*
 * p2_LCD.c
 *
-* Created: 4/17/2018 3:56:51 PM
-* Author : khadb
+*
+* Author : khadb, luankn
 */
 
 #include "avr.h"
 #include "lcd.h"
+#include "main.h"
 
-unsigned char numToChar(int num){
-	switch(num){
-		case 1: return '1'; break;
-		case 2: return '2'; break;
-		case 3: return '3'; break;
-		case 4: return 'A'; break;
-		case 5: return '4'; break;
-		case 6: return '5'; break;
-		case 7: return '6'; break;
-		case 8: return 'B'; break;
-		case 9: return '7'; break;
-		case 10: return '8'; break;
-		case 11: return '9'; break;
-		case 12: return 'C'; break;
-		case 13: return '*'; break;
-		case 14: return '0'; break;
-		case 15: return '#'; break;
-		case 16: return 'D'; break;
-		default: return 0; break;
+/* define hour*/
+#define h = 8;
+#define m = 0;
+#define s = 0;
+
+/* define day*/
+#define YYYY = 2018;
+#define MM = 5;
+#define DD = 1;
+#define days_of_month [] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
+/*note: no month 0*/
+
+unsigned char numToChar(int num)
+{
+	switch (num)
+	{
+	case 1:
+		return '1';
+		break;
+	case 2:
+		return '2';
+		break;
+	case 3:
+		return '3';
+		break;
+	case 4:
+		return 'A';
+		break;
+	case 5:
+		return '4';
+		break;
+	case 6:
+		return '5';
+		break;
+	case 7:
+		return '6';
+		break;
+	case 8:
+		return 'B';
+		break;
+	case 9:
+		return '7';
+		break;
+	case 10:
+		return '8';
+		break;
+	case 11:
+		return '9';
+		break;
+	case 12:
+		return 'C';
+		break;
+	case 13:
+		return '*';
+		break;
+	case 14:
+		return '0';
+		break;
+	case 15:
+		return '#';
+		break;
+	case 16:
+		return 'D';
+		break;
+	default:
+		return 0;
+		break;
 	}
 }
 
 //Need to fix
-unsigned int is_pressed(int r, int c){
+unsigned int is_pressed(int r, int c)
+{
 	c += 4;
 	//Set row to output and STRONG 0
 	SET_BIT(DDRC, r);
 	CLR_BIT(PORTC, r);
-	
+
 	//Set column to input and WEAK 1
 	CLR_BIT(DDRC, c);
 	SET_BIT(PORTC, c);
-	
+
 	return (GET_BIT(PINC, c)) == 0 ? 1 : 0;
 }
 
-unsigned int get_key(){
-	int r,c;
-	for(r = 0; r < 4; ++r){
-		for(c = 0; c < 4; ++c){
-			if (is_pressed(r,c))
-			return r*4+c+1;
+unsigned int get_key()
+{
+	int r, c;
+	for (r = 0; r < 4; ++r)
+	{
+		for (c = 0; c < 4; ++c)
+		{
+			if (is_pressed(r, c))
+				return r * 4 + c + 1;
 		}
 	}
 	return 0;
 }
 
+char isLeapYear()
+{
+	if (YYYY % 4 == 0)
+		if (YYYY % 100 == 0)
+			if (YYYY % 400 == 0)
+				return 1; /* true */
+	return 0;				/* false */
+}
+
+void increaseDay()
+{
+	if (!(isLeapYear() && MM == 2))
+	{
+		if (++DD && DD > days_of_month[MM])
+		{
+			DD = 1;
+			if (++MM && MM > 12)
+			{
+				MM = 1;
+				++YYYY;
+			}
+		}
+	}
+	else
+	{
+		if (++DD && DD > 29)
+		{
+			DD = 1;
+			if (++MM && MM > 12)
+			{
+				MM = 1;
+				++YYYY;
+			}
+		}
+	}
+}
+
+void increaseTime()
+{
+	++s;
+	if (s > 59)
+	{
+		++m;
+		s = 0;
+	}
+	if (m > 59)
+	{
+		++h;
+		m = 0;
+	}
+	if (h > 23)
+	{
+		h = 0;
+		increaseDay();
+	}
+}
 
 int main(void)
 {
@@ -65,18 +174,16 @@ int main(void)
 	{
 		//Set to default
 		DDRC = 0x00;
-		
+
 		//Keypad
 		unsigned int num = get_key();
 		wait_avr(100); // wait to release button
-		if(num){
+		if (num)
+		{
 			//clear
 			clr_lcd();
 			//wait_avr(500);
 			put_lcd(numToChar(num));
-
-		} 
-		
+		}
 	}
 }
-
