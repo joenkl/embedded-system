@@ -4,21 +4,21 @@
 *
 * Author : khadb, luankn
 */
-
+#include "stdio.h"
 #include "avr.h"
 #include "lcd.h"
 
 /* define hour*/
 char isCivil = 0;
 char AM = 1;
-char h = 8;
-char m = 0;
-char s = 0;
+char h = 23;
+char m = 59;
+char s = 50;
 
 /* define day*/
-int YYYY = 2018;
-int MM = 5;
-int DD = 1;
+int YYYY = 2016;
+int MM = 2;
+int DD = 29;
 const int days_of_month[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 /*note: no month 0*/
 
@@ -85,7 +85,6 @@ unsigned int is_pressed(int r, int c)
 {
 	//Set to default
 	DDRC = 0;
-	PORTC = 0;
 	
 	c += 4;
 	//Set row to output and STRONG 0
@@ -224,23 +223,45 @@ void militaryToCivilTime()
 
 int main(void)
 {
+	/* Replace with your application code */
 	ini_avr();
 	ini_lcd();
+
+	clr_lcd();
+	char bufDate[17];
+	char bufTime[17];
+	//Print date format
+	sprintf(bufDate, "%02i/%02i/%02i", MM, DD,YYYY);
+	pos_lcd(0,0);
+	puts_lcd2(bufDate);
 	
-	DDRB = 0x08; //set B3 output
-	put_lcd('A');
-	/* Replace with your application code */
+	//Print time
+	sprintf(bufTime, "%02i:%02i:%02i", h, m, s);
+	pos_lcd(1,0);
+	puts_lcd2(bufTime);
+	
 	while (1)
 	{
-		//Keypad
-		unsigned int num = get_key();
-		wait_avr(100); // wait to release button
-		if (num)
-		{
-			//clear
-			clr_lcd();
-			//wait_avr(500);
-			put_lcd(numToChar(num));
-		}
+		////Keypad
+		//unsigned int num = get_key();
+		//wait_avr(100); // wait to release button
+		//if (num)
+		//{
+			////clear
+			//clr_lcd();
+			////wait_avr(500);
+			//put_lcd(numToChar(num));
+		//}
+		increaseTime();
+		//Print date format
+		sprintf(bufDate, "%02i/%02i/%02i", MM, DD,YYYY);
+		pos_lcd(0,0);
+		puts_lcd2(bufDate);
+		
+		//Print time
+		sprintf(bufTime, "%02i:%02i:%02i", h, m, s);
+		pos_lcd(1,0);
+		puts_lcd2(bufTime);
+		wait_avr(1000);
 	}
 }
