@@ -10,6 +10,8 @@
 #include "main.h"
 
 /* define hour*/
+#define isCivil = 0;
+#define AM = 1;
 #define h = 8;
 #define m = 0;
 #define s = 0;
@@ -194,6 +196,26 @@ char setTime(char hour, char minute, char second)
 	m = minute;
 	s = second;
 	return 1;
+}
+
+void civilToMilitaryTime()
+{
+	if (!AM)
+	{
+		h + 12;
+	}
+
+	isCivil = 0;
+}
+void militaryToCivilTime()
+{
+	if (h > 11)
+	{
+		if (h > 12)
+			h = h - 12;
+		AM = 0;
+	}
+	isCivil = 1;
 }
 
 int main(void)

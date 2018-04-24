@@ -9,5 +9,7 @@ void increaseTime();
 char isLeapYear();
 void setDay(char day, char month, char year);
 void setTime(char hour, char minutes, char second);
+void civilToMilitaryTime();
+void militaryToCivilTime();
 
 #endif
