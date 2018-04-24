@@ -84,6 +84,10 @@ unsigned char numToChar(int num)
 //Need to fix
 unsigned int is_pressed(int r, int c)
 {
+	//Set to default
+	DDRC = 0;
+	PORTC = 0;
+	
 	c += 4;
 	//Set row to output and STRONG 0
 	SET_BIT(DDRC, r);
@@ -225,9 +229,6 @@ int main(void)
 	/* Replace with your application code */
 	while (1)
 	{
-		//Set to default
-		DDRC = 0x00;
-
 		//Keypad
 		unsigned int num = get_key();
 		wait_avr(100); // wait to release button
