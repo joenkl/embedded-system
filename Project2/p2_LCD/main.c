@@ -7,20 +7,19 @@
 
 #include "avr.h"
 #include "lcd.h"
-#include "main.h"
 
 /* define hour*/
-#define isCivil = 0;
-#define AM = 1;
-#define h = 8;
-#define m = 0;
-#define s = 0;
+char isCivil = 0;
+char AM = 1;
+char h = 8;
+char m = 0;
+char s = 0;
 
 /* define day*/
-#define YYYY = 2018;
-#define MM = 5;
-#define DD = 1;
-#define days_of_month [] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}
+int YYYY = 2018;
+int MM = 5;
+int DD = 1;
+const int days_of_month[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 /*note: no month 0*/
 
 unsigned char numToChar(int num)
@@ -169,12 +168,13 @@ void increaseTime()
 	}
 }
 
-char setDay(char day, char month, char year)
+int setDay(int day, int month, int year)
 {
 	if (month > 12 || month == 0 || year == 0 || day == 0)
 		return 0; //Error
 
 	if (day > days_of_month[month])
+	{
 		if (month != 2)
 			return 0; //need to check for leap year
 		else
@@ -184,14 +184,14 @@ char setDay(char day, char month, char year)
 			if (!isLeapYear())
 				return 0;
 		}
-
+	}
 	DD = day;
 	MM = month;
 	YYYY = year;
 	return 1;
 }
 
-char setTime(char hour, char minute, char second)
+int setTime(char hour, char minute, char second)
 {
 	if (hour > 23 || minute > 59 || second > 59)
 		return 0;
@@ -206,7 +206,7 @@ void civilToMilitaryTime()
 {
 	if (!AM)
 	{
-		h + 12;
+		h += 12;
 	}
 
 	isCivil = 0;
@@ -224,8 +224,11 @@ void militaryToCivilTime()
 
 int main(void)
 {
-	DDRB = 0x08; //set B3 output
+	ini_avr();
 	ini_lcd();
+	
+	DDRB = 0x08; //set B3 output
+	put_lcd('A');
 	/* Replace with your application code */
 	while (1)
 	{
