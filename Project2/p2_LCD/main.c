@@ -284,6 +284,14 @@ void getInputAndSetDay()
 {
 	//clear
 	clr_lcd();
+	//Print message
+	sprintf(bufmsg, "SetDay MM/DD/YYYY") /*Exactly 17 char*/;
+	pos_lcd(0, 0);
+	puts_lcd2(bufmsg);
+
+	//Set position to row 2:
+	pos_lcd(1, 0);
+
 	int in[10] = {0, 0, 10, 0, 0, 10, 0, 0, 0, 0};
 	char current = 0;
 	int n = 11;
@@ -291,10 +299,11 @@ void getInputAndSetDay()
 	int dd, mm, yyyy;
 	while (current < 10)
 	{
-		/*Print the dash MM-DD-YYYY*/
+		/*Print the dash MM/DD/YYYY*/
 		if (current == 2 || current == 5)
 		{
-			put_lcd('-');
+			pos_lcd(1, current);
+			put_lcd('/');
 			++current;
 		}
 
@@ -302,16 +311,16 @@ void getInputAndSetDay()
 		wait_avr(100);
 		n2 = numToInt(n);
 
-		if (n2 != 11)
+		if (n2 < 10)
 		{
 			in[current] = n2;
 			pos_lcd(1, current);
-			++current;
 			put_lcd(numToChar(n));
+			++current;
 		}
 	}
 
-	/*MM-DD-YYYY*/
+	/*MM/DD/YYYY*/
 	mm = in[0] * 10 + in[1];
 	dd = in[3] * 10 + in[4];
 	yyyy = in[6] * 1000 + in[7] * 100 + in[8] * 10 + in[9];
@@ -319,7 +328,6 @@ void getInputAndSetDay()
 	char s = setDay(dd, mm, yyyy);
 	if (!s)
 	{
-
 		sprintf(bufmsg, "Invalid Data");
 		pos_lcd(0, 0);
 		puts_lcd2(bufmsg);
@@ -328,6 +336,58 @@ void getInputAndSetDay()
 
 void getInputAndSetTime()
 {
+	//clear
+	clr_lcd();
+
+	//Print message
+	sprintf(bufmsg, "Set Time hh:mm:ss") /*Exactly 17 char*/;
+	pos_lcd(0, 0);
+	puts_lcd2(bufmsg);
+
+	//Set position to row 2:
+	pos_lcd(1, 0);
+
+	int in[8] = {0, 0, 10, 0, 0, 10, 0, 0};
+	char current = 0;
+	int n = 11;
+	int n2;
+
+	while (current < 8)
+	{
+		/*Print the dash hh:mm:ss*/
+		if (current == 2 || current == 5)
+		{
+			pos_lcd(1, current);
+			put_lcd(':');
+			++current;
+		}
+
+		n = get_key();
+		wait_avr(100);
+		n2 = numToInt(n);
+
+		if (n2 < 10)
+		{
+			in[current] = n2;
+			pos_lcd(1, current);
+			put_lcd(numToChar(n));
+			++current;
+		}
+	}
+
+	/*hh:mm:ss*/
+	char h, m, s;
+	h = in[0] * 10 + in[1];
+	m = in[3] * 10 + in[4];
+	s = in[6] * 10 + in[7];
+
+	char s = setTime(h, m, s);
+	if (!s)
+	{
+		sprintf(bufmsg, "Invalid Data");
+		pos_lcd(0, 0);
+		puts_lcd2(bufmsg);
+	}
 }
 void displayInfo()
 {
