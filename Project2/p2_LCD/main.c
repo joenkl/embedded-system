@@ -22,6 +22,8 @@ int DD = 29;
 const int days_of_month[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 /*note: no month 0*/
 
+char bufmsg[17];
+
 unsigned char numToChar(int num)
 {
 	switch (num)
@@ -278,9 +280,59 @@ void militaryToCivilTime()
 	}
 	isCivil = 1;
 }
+void getInputAndSetDay()
+{
+	//clear
+	clr_lcd();
+	int in[10] = {0, 0, 10, 0, 0, 10, 0, 0, 0, 0};
+	char current = 0;
+	int n = 11;
+	int n2;
+	int dd, mm, yyyy;
+	while (current < 10)
+	{
+		/*Print the dash MM-DD-YYYY*/
+		if (current == 2 || current == 5)
+		{
+			put_lcd('-');
+			++current;
+		}
 
+		n = get_key();
+		wait_avr(100);
+		n2 = numToInt(n);
+
+		if (n2 != 11)
+		{
+			in[current] = n2;
+			pos_lcd(1, current);
+			++current;
+			put_lcd(numToChar(n));
+		}
+	}
+
+	/*MM-DD-YYYY*/
+	mm = in[0] * 10 + in[1];
+	dd = in[3] * 10 + in[4];
+	yyyy = in[6] * 1000 + in[7] * 100 + in[8] * 10 + in[9];
+
+	char s = setDay(dd, mm, yyyy);
+	if (!s)
+	{
+
+		sprintf(bufmsg, "Invalid Data");
+		pos_lcd(0, 0);
+		puts_lcd2(bufmsg);
+	}
+}
+
+void getInputAndSetTime()
+{
+}
 void displayInfo()
 {
+	char bufDate[17];
+	char bufTime[17];
 	//Print date format
 	sprintf(bufDate, "%02i/%02i/%02i", MM, DD, YYYY);
 	pos_lcd(0, 0);
@@ -299,17 +351,9 @@ int main(void)
 	ini_lcd();
 
 	clr_lcd();
-	char bufDate[17];
-	char bufTime[17];
-	//Print date format
-	sprintf(bufDate, "%02i/%02i/%02i", MM, DD, YYYY);
-	pos_lcd(0, 0);
-	puts_lcd2(bufDate);
 
-	//Print time
-	sprintf(bufTime, "%02i:%02i:%02i", h, m, s);
-	pos_lcd(1, 0);
-	puts_lcd2(bufTime);
+	/*init time*/
+	displayInfo();
 
 	while (1)
 	{
@@ -317,54 +361,14 @@ int main(void)
 		//Keypad
 		unsigned int num = get_key();
 		wait_avr(100); // wait to release button
-		if ((num == 4) /*A: set day*/)
-		{
-			//clear
-			clr_lcd();
-			int in[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-			char current = 0;
-			int n = 11;
-			int n2;
-			int dd, mm, yyyy;
-			while (current < 10)
-			{
-				n = get_key();
-				wait_avr(100);
-				n2 = numToInt(n);
 
-				if (n2 != 11)
-				{
-					in[current] = n2;
-					pos_lcd(1, current);
-					++current;
-					put_lcd(numToChar(n));
-				}
-			}
+		if (num == 4 /*A: set day*/)
+			getInputAndSetDay();
 
-			dd = in[0] * 10 + in[1];
-			mm = in[2] * 10 + in[3];
-			yyyy = in[4] * 1000 + in[5] * 100 + in[6] * 10 + in[7];
+		if (num == 8) /*B: set time*/
+			getInputAndSetTime();
 
-			char s = setDay(dd, mm, yyyy);
-			if (!s)
-			{
-				char bufmsg[17];
-				sprintf(bufmsg, "Invalid Data");
-				pos_lcd(0, 0);
-				puts_lcd2(bufmsg);
-			}
-		}
-		else if (|| (num == 8) /*B: set time*/)
-		{
-			//clear
-			clr_lcd();
-			//wait_avr(500);
-			put_lcd(numToChar(num));
-		}
-		else
-		{
-			displayInfo();
-			wait_avr(900);
-		}
+		displayInfo();
+		wait_avr(900);
 	}
 }
