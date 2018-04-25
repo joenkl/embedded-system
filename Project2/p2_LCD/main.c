@@ -80,12 +80,70 @@ unsigned char numToChar(int num)
 	}
 }
 
+unsigned char numToInt(int num)
+{
+	switch (num)
+	{
+	case 1:
+		return 1;
+		break;
+	case 2:
+		return 2;
+		break;
+	case 3:
+		return 3;
+		break;
+	case 4:
+		return 11;
+		break;
+	case 5:
+		return 4;
+		break;
+	case 6:
+		return 5;
+		break;
+	case 7:
+		return 6;
+		break;
+	case 8:
+		return 11;
+		break;
+	case 9:
+		return 7;
+		break;
+	case 10:
+		return 8;
+		break;
+	case 11:
+		return 9;
+		break;
+	case 12:
+		return 11;
+		break;
+	case 13:
+		return 11;
+		break;
+	case 14:
+		return 0;
+		break;
+	case 15:
+		return 11;
+		break;
+	case 16:
+		return 11;
+		break;
+	default:
+		return 11;
+		break;
+	}
+}
+
 //Need to fix
 unsigned int is_pressed(int r, int c)
 {
 	//Set to default
 	DDRC = 0;
-	
+
 	c += 4;
 	//Set row to output and STRONG 0
 	SET_BIT(DDRC, r);
@@ -221,6 +279,19 @@ void militaryToCivilTime()
 	isCivil = 1;
 }
 
+void displayInfo()
+{
+	//Print date format
+	sprintf(bufDate, "%02i/%02i/%02i", MM, DD, YYYY);
+	pos_lcd(0, 0);
+	puts_lcd2(bufDate);
+
+	//Print time
+	sprintf(bufTime, "%02i:%02i:%02i", h, m, s);
+	pos_lcd(1, 0);
+	puts_lcd2(bufTime);
+}
+
 int main(void)
 {
 	/* Replace with your application code */
@@ -231,37 +302,69 @@ int main(void)
 	char bufDate[17];
 	char bufTime[17];
 	//Print date format
-	sprintf(bufDate, "%02i/%02i/%02i", MM, DD,YYYY);
-	pos_lcd(0,0);
+	sprintf(bufDate, "%02i/%02i/%02i", MM, DD, YYYY);
+	pos_lcd(0, 0);
 	puts_lcd2(bufDate);
-	
+
 	//Print time
 	sprintf(bufTime, "%02i:%02i:%02i", h, m, s);
-	pos_lcd(1,0);
+	pos_lcd(1, 0);
 	puts_lcd2(bufTime);
-	
+
 	while (1)
 	{
-		////Keypad
-		//unsigned int num = get_key();
-		//wait_avr(100); // wait to release button
-		//if (num)
-		//{
-			////clear
-			//clr_lcd();
-			////wait_avr(500);
-			//put_lcd(numToChar(num));
-		//}
 		increaseTime();
-		//Print date format
-		sprintf(bufDate, "%02i/%02i/%02i", MM, DD,YYYY);
-		pos_lcd(0,0);
-		puts_lcd2(bufDate);
-		
-		//Print time
-		sprintf(bufTime, "%02i:%02i:%02i", h, m, s);
-		pos_lcd(1,0);
-		puts_lcd2(bufTime);
-		wait_avr(1000);
+		//Keypad
+		unsigned int num = get_key();
+		wait_avr(100); // wait to release button
+		if ((num == 4) /*A: set day*/)
+		{
+			//clear
+			clr_lcd();
+			int in[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+			char current = 0;
+			int n = 11;
+			int n2;
+			int dd, mm, yyyy;
+			while (current < 10)
+			{
+				n = get_key();
+				wait_avr(100);
+				n2 = numToInt(n);
+
+				if (n2 != 11)
+				{
+					in[current] = n2;
+					pos_lcd(1, current);
+					++current;
+					put_lcd(numToChar(n));
+				}
+			}
+
+			dd = in[0] * 10 + in[1];
+			mm = in[2] * 10 + in[3];
+			yyyy = in[4] * 1000 + in[5] * 100 + in[6] * 10 + in[7];
+
+			char s = setDay(dd, mm, yyyy);
+			if (!s)
+			{
+				char bufmsg[17];
+				sprintf(bufmsg, "Invalid Data");
+				pos_lcd(0, 0);
+				puts_lcd2(bufmsg);
+			}
+		}
+		else if (|| (num == 8) /*B: set time*/)
+		{
+			//clear
+			clr_lcd();
+			//wait_avr(500);
+			put_lcd(numToChar(num));
+		}
+		else
+		{
+			displayInfo();
+			wait_avr(900);
+		}
 	}
 }
