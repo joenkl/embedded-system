@@ -428,6 +428,8 @@ int main(void)
 		if (num == 8) /*B: set time*/
 			getInputAndSetTime();
 
+		//if (num == 13) /* *: time toggle*/
+
 		displayInfo();
 		wait_avr(900);
 	}
