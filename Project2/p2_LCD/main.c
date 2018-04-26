@@ -8,7 +8,7 @@
 #include "avr.h"
 #include "lcd.h"
 
-/* define hour*/
+/* define default hour*/
 char isCivil = 1;
 char AM = 0;
 char h = 0;
@@ -17,7 +17,7 @@ char m = 59;
 char s = 55;
 
 
-/* define day*/
+/* define default day*/
 int YYYY = 2016;
 int MM = 2;
 int DD = 29;
@@ -370,7 +370,7 @@ void getInputAndSetDay()
 		{
 			printMsg("Invalid Input");
 			} else {
-			printMsg("Date is set");
+			printMsg("Date is set!");
 		}
 	}
 
@@ -469,14 +469,15 @@ int main(void)
 	clr_lcd();
 
 	/*init time*/
-	displayInfo();
+	//displayInfo();
 
 	while (1)
 	{
+		displayInfo();
 
 		//Keypad
 		unsigned int num = get_key();
-		wait_avr(100); // wait to release button
+		wait_avr(50); // wait to release button
 
 		if (num == 4 /*A: set day*/)
 		{
@@ -491,12 +492,12 @@ int main(void)
 		if (num == 13)
 		{
 			if (isCivil == 1)
-			isCivil = 0;
+				isCivil = 0;
 			else
-			isCivil = 1;
+				isCivil = 1;
 		}
-		wait_avr(900);
+		wait_avr(949);
 		increaseTime();
-		displayInfo();
+
 	}
 }
