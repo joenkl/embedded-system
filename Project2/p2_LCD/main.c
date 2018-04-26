@@ -9,11 +9,13 @@
 #include "lcd.h"
 
 /* define hour*/
-char isCivil = 0;
-char AM = 1;
-char h = 23;
+char isCivil = 1;
+char AM = 0;
+char h = 0;
+char civilH = 12;
 char m = 59;
-char s = 50;
+char s = 55;
+
 
 /* define day*/
 int YYYY = 2016;
@@ -208,6 +210,28 @@ void increaseDay()
 	}
 }
 
+void militaryToCivilTime() {
+	if (h == 0)
+	{
+		civilH = 12;
+		AM = 1;
+	}
+	else if (h < 12 && h > 0)
+	{
+		civilH = h;
+	}
+	else if (h == 12)
+	{
+		civilH = h;
+		AM = 0;
+	}
+	else if (h > 12)
+	{
+		civilH = h - 12;
+		AM = 0;
+	}
+}
+
 void increaseTime()
 {
 	++s;
@@ -221,12 +245,15 @@ void increaseTime()
 		++h;
 		m = 0;
 	}
+
 	if (h > 23)
 	{
 		h = 0;
 		increaseDay();
 	}
+	militaryToCivilTime();
 }
+
 
 int setDay(int day, int month, int year)
 {
@@ -262,25 +289,6 @@ int setTime(char hour, char minute, char second)
 	return 1;
 }
 
-void civilToMilitaryTime()
-{
-	if (!AM)
-	{
-		h += 12;
-	}
-
-	isCivil = 0;
-}
-void militaryToCivilTime()
-{
-	if (h > 11)
-	{
-		if (h > 12)
-		h = h - 12;
-		AM = 0;
-	}
-	isCivil = 1;
-}
 
 void printMsg(const char * str){
 	clr_lcd();
@@ -289,22 +297,26 @@ void printMsg(const char * str){
 	puts_lcd2(bufmsg);
 }
 
-void confirm(int * check){
+unsigned int confirm(){
 	int key = 0;
 	int pressed = 0;
+	int check = 0;
 	
 	while(!pressed){
-		key = numToInt(get_key());
+		key = get_key();
 		
 		if(key == 12)
 		{
-			*check = 0;
+			check = 0;
 			pressed = 1;
-		} else if (key == 16){
+			} else if (key == 16){
 			pressed = 1;
-			*check = 1;
+			check = 1;
 		}
+		wait_avr(100);
 	}
+	
+	return check;
 }
 
 void getInputAndSetDay()
@@ -319,8 +331,8 @@ void getInputAndSetDay()
 	int n = 11;
 	int n2;
 	int dd, mm, yyyy;
-	char isNotCancelled = 1;
-	while (current < 10 && isNotCancelled)
+	
+	while (current < 10 )
 	{
 		/*Print the dash MM/DD/YYYY*/
 		if (current == 2 || current == 5)
@@ -331,9 +343,6 @@ void getInputAndSetDay()
 		}
 
 		n = get_key();
-		
-		if (n == 12)
-			isNotCancelled = 0;
 		
 		wait_avr(250);
 		n2 = numToInt(n);
@@ -347,33 +356,25 @@ void getInputAndSetDay()
 		}
 	}
 	
-	
-	if(isNotCancelled){
+	if (confirm() == 0) {
+		printMsg("CANCELED");
+		} else {
 		/*MM/DD/YYYY*/
 		mm = in[0] * 10 + in[1];
 		dd = in[3] * 10 + in[4];
 		yyyy = in[6] * 1000 + in[7] * 100 + in[8] * 10 + in[9];
+
 		
-		char confirmInput = 0;
-		while (confirmInput){
-			n = get_key();
-			if (n == 12){
-				printMsg("Canceled");
-				confirmInput = 1;
-			}
-			else {
-				char c = setDay(dd, mm, yyyy);
-				if (!c)
-				{
-					printMsg("Invalid Input");
-					wait_avr(2500);
-				}
-				confirmInput = 1;
-			}
+		char c = setDay(dd, mm, yyyy);
+		if (!c)
+		{
+			printMsg("Invalid Input");
+			} else {
+			printMsg("Date is set");
 		}
-		
-	} else
-		printMsg("Canceled!");
+	}
+
+	wait_avr(2000);
 }
 
 void getInputAndSetTime()
@@ -411,31 +412,48 @@ void getInputAndSetTime()
 		}
 	}
 
-	/*hh:mm:ss*/
-	char hh, mm, ss;
-	hh = in[0] * 10 + in[1];
-	mm = in[3] * 10 + in[4];
-	ss = in[6] * 10 + in[7];
+	if (confirm() == 0){
+		printMsg("CANCELED");
+		} else {
+		/*hh:mm:ss*/
+		char hh, mm, ss;
+		hh = in[0] * 10 + in[1];
+		mm = in[3] * 10 + in[4];
+		ss = in[6] * 10 + in[7];
 
-	char c = setTime(hh, mm, ss);
-	if (!c)
-	{
-		printMsg("Invalid Input");
-		wait_avr(2500);
+		char c = setTime(hh, mm, ss);
+		if (!c)
+		{
+			printMsg("Invalid Input");
+			} else {
+			printMsg("Time is set!");
+		}
 	}
+	
+	wait_avr(2000);
 }
 
 void displayInfo()
 {
+	clr_lcd();
 	char bufDate[17];
 	char bufTime[17];
 	//Print date format
 	sprintf(bufDate, "%02i/%02i/%02i", MM, DD, YYYY);
 	pos_lcd(0, 0);
 	puts_lcd2(bufDate);
-
 	//Print time
+	if (isCivil)
+	{
+		if (AM)
+		sprintf(bufTime, "%02i:%02i:%02i AM", civilH, m, s);
+		else
+		sprintf(bufTime, "%02i:%02i:%02i PM", civilH, m, s);
+		
+	}
+	else
 	sprintf(bufTime, "%02i:%02i:%02i", h, m, s);
+	
 	pos_lcd(1, 0);
 	puts_lcd2(bufTime);
 }
@@ -470,7 +488,13 @@ int main(void)
 			getInputAndSetTime();
 			clr_lcd();
 		}
-		//if (num == 13) /* *: time toggle*/
+		if (num == 13)
+		{
+			if (isCivil == 1)
+			isCivil = 0;
+			else
+			isCivil = 1;
+		}
 		wait_avr(900);
 		increaseTime();
 		displayInfo();
