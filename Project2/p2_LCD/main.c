@@ -417,7 +417,7 @@ int main(void)
 
 	while (1)
 	{
-		increaseTime();
+
 		//Keypad
 		unsigned int num = get_key();
 		wait_avr(100); // wait to release button
@@ -429,8 +429,8 @@ int main(void)
 			getInputAndSetTime();
 
 		//if (num == 13) /* *: time toggle*/
-
-		displayInfo();
 		wait_avr(900);
+		increaseTime();
+		displayInfo();
 	}
 }
