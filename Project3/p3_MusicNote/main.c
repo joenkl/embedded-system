@@ -20,12 +20,8 @@ int main(void)
 	clr_lcd();
 	puts_lcd2("Hello");
 	/*init time*/
-	SET_BIT(DDRB, 3);
 	while (1)
 	{
-		SET_BIT(PORTB, 3);
-		wait_avrMicro(1000);
-		CLR_BIT(PORTB, 3);
-		wait_avrMicro(1000);
+		//play_note(114, 1);
 	}
 }
