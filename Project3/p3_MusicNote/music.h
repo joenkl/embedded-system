@@ -22,13 +22,20 @@
 #define Gs 60
 
 //      duration
-#define WHOLE 1
-#define HALF 0.5
-#define QUARTER 0.25
-#define EIGHT 0.125
+#define W 1
+#define H 0.5
+#define Q 0.25
+#define EI 0.125
+
+unsigned int tempo;
+
+typedef struct Note{
+	unsigned int freq;
+	float duration;
+} note;
 
 void wait_avrMicro(unsigned long microsec);
-void play_music();
+void play_song(note *song, unsigned int songDuration);
 void play_note(unsigned int freq, float duration);
 
 #endif

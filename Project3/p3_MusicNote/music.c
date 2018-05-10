@@ -7,11 +7,6 @@
 #include "avr.h"
 #include "music.h"
 
-typedef struct Notes{
-	unsigned int freq;
-	float duration;
-} note;
-
 void wait_avrMicro(unsigned long microsec)
 {
 	TCCR0 = 2;
