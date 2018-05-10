@@ -5,3 +5,5 @@
 
 unsigned int is_pressed(int r, int c);
 unsigned int get_key();
+
+#endif
