@@ -1,10 +1,3 @@
-/*
-* music.c
-*
-* Created: 5/9/2018 9:53:28 PM
-*  Author: khadb
-*/
-#include "avr.h"
 #include "music.h"
 
 void wait_avrMicro(unsigned long microsec)
@@ -19,11 +12,65 @@ void wait_avrMicro(unsigned long microsec)
 	TCCR0 = 0;
 }
 
-void play_song(note *song, unsigned int songDuration){
+void clearBuf(){
+	sprintf(bufmsg,"                 ");
+}
+
+void clrLine(unsigned int r){
+	clearBuf();
+	pos_lcd(r,0);
+	puts_lcd2(bufmsg);
+}
+
+void play_song(songs song){
+	clr_lcd();
 	
-	for (volatile unsigned int i = 0; i < songDuration; ++i){
-		play_note(song[i].freq, song[i].duration);
-		wait_avrMicro(100); //wait 1ms
+	//display song name
+	clearBuf();
+	sprintf(bufmsg, "%s", song.name);
+	pos_lcd(0,0);
+	puts_lcd2(bufmsg);
+	
+	//temp and volume
+	clearBuf();
+	sprintf(bufmsg, "V: %d ", volume);
+	pos_lcd(1,0);
+	puts_lcd2(bufmsg);
+	
+	clearBuf();
+	sprintf(bufmsg, "T: %d ", tempo);
+	pos_lcd(1,8);
+	puts_lcd2(bufmsg);
+	
+	unsigned int key = 0;
+	char change = 0;
+	for (volatile unsigned int i = 0; i < song.duration; ++i){
+		key = get_key();
+		wait_avrMicro(5);
+		if(key){
+			switch(key){
+				case 4: if(volume < 10){++volume; change = 1;} break;	//volumeUp key A
+				case 8: if(volume > 1){--volume; change = 1;} break;	//volumeDown key B
+				case 12: if(tempo < 10){++tempo; change = 1;} break;	//tempoUp key C
+				case 16: if(tempo > 1){--tempo; change = 1;} break;		//tempoDown key D
+				default: break;
+			}
+			
+			if(change){
+				clearBuf();
+				sprintf(bufmsg, "%d ", volume);
+				pos_lcd(1,3);
+				puts_lcd2(bufmsg);
+				
+				clearBuf();
+				sprintf(bufmsg, "%d ", tempo);
+				pos_lcd(1,11);
+				puts_lcd2(bufmsg);
+			}
+		}
+		
+		play_note(song.melody[i].freq, song.melody[i].duration);
+		wait_avrMicro(50); //wait 1ms
 	}
 }
 
@@ -32,12 +79,15 @@ void play_note(unsigned int freq, float duration){
 	//each wait is 10us
 	//duration = 1s = 100 000
 	//k = duration * 8 * 10000 because duration is multiple of 8
-	int k = duration * 8 * 10000 / freq;
+	//tempo is from .1 to 2
+	int k = duration * 8 * 12500 * ((float)(tempo+10)/10) / freq;
+	unsigned int Th = freq + (freq*(volume-1)/10);
+	unsigned int Tl = freq - (freq*(volume-1)/10);
 	
 	for (int i = 0; i < k; ++i){
 		SET_BIT(PORTB, 3);
-		wait_avrMicro(freq);
+		wait_avrMicro(Th); //TH
 		CLR_BIT(PORTB, 3);
-		wait_avrMicro(freq);
+		wait_avrMicro(Tl); //TL
 	}
 }

@@ -1,11 +1,10 @@
-/*
- * music.h
- *
- * Created: 5/9/2018 10:03:40 PM
- *  Author: khadb
- */ 
 #ifndef __music__
 #define __music__
+
+#include "avr.h"
+#include "keypad.h"
+#include "stdio.h"
+#include "lcd.h"
 
 //     note delay(freq)
 #define A 114
@@ -27,15 +26,28 @@
 #define Q 0.25
 #define EI 0.125
 
+//message
+char bufmsg[17];
+//default temp
 unsigned int tempo;
+//default volume
+unsigned int volume;
 
-typedef struct Note{
+typedef struct{
 	unsigned int freq;
 	float duration;
 } note;
 
+typedef struct {
+	char name[17];
+	note *melody;
+	unsigned int duration;
+}songs;
+
 void wait_avrMicro(unsigned long microsec);
-void play_song(note *song, unsigned int songDuration);
+void play_song(songs song);
 void play_note(unsigned int freq, float duration);
+void clearBuf();
+void clrLine(unsigned int r);
 
 #endif
