@@ -70,7 +70,7 @@ void play_song(songs song){
 		}
 		
 		play_note(song.melody[i].freq, song.melody[i].duration);
-		wait_avrMicro(50); //wait 1ms
+		wait_avrMicro(100); //wait 1ms
 	}
 }
 
@@ -79,8 +79,8 @@ void play_note(unsigned int freq, float duration){
 	//each wait is 10us
 	//duration = 1s = 100 000
 	//k = duration * 8 * 10000 because duration is multiple of 8
-	//tempo is from .1 to 2
-	int k = duration * 8 * 12500 * ((float)(tempo+10)/10) / freq;
+	//tempo is increasing from .1 to 2
+	int k = duration * 8 * 10000 / ((float)(tempo+10)/10) / freq;
 	unsigned int Th = freq + (freq*(volume-1)/10);
 	unsigned int Tl = freq - (freq*(volume-1)/10);
 	
