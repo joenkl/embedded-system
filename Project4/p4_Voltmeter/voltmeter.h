@@ -8,14 +8,15 @@
 char bufMsg[17];
 unsigned char bufChar[4];
 
-	float currVol;
-	float maxVol;
-	float minVol;
-	float avgVol;
+float currVol;
+float maxVol;
+float minVol;
+float avgVol;
+unsigned int count;
+unsigned int total;
 
-float A2D(unsigned int analogVal);
 void ini_meter();
-void startMeter();
+unsigned float startMeter();
 void displayCurrVol();
 void displayAvgVol();
 void displayMinVol();

@@ -5,30 +5,30 @@
 
 #include "voltmeter.h"
 
-//convert analog to digital
-float A2D(unsigned int analogVal){
-	
-}
-
 //reset display
 void ini_meter(){
 	currVol = 0.00;
 	avgVol = 0.00;
 	minVol = 0.00;
 	maxVol = 0.00;
+	count = 0;
+	total = 0;
+	
+	clr_lcd();
 	
 	pos_lcd(0,0);
-	sprintf(bufMsg, "V: %.2f A: %.2f", currVol, avgVol);
+	sprintf(bufMsg, "Cur:_.__ Avg:_.__");
 	puts_lcd2(bufMsg);
 	
 	pos_lcd(1,0);
-	sprintf(bufMsg, "L: %.2f H: %.2f", minVol, maxVol);
+	sprintf(bufMsg, "Min:____ Max:____");
 	puts_lcd2(bufMsg);
 }
 
 //start to measure voltage
-void startMeter(){
-	
+//return a value read from port
+unsigned float startMeter(){
+	return 0.0;
 }
 
 void displayCurrVol(){
