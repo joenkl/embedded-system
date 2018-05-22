@@ -12,11 +12,11 @@ float currVol;
 float maxVol;
 float minVol;
 float avgVol;
+float total;
 unsigned int count;
-unsigned int total;
 
+unsigned short get_A2D();
 void ini_meter();
-unsigned float startMeter();
 void displayCurrVol();
 void displayAvgVol();
 void displayMinVol();
