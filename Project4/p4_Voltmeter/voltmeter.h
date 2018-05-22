@@ -4,15 +4,17 @@
 
 #include "avr.h"
 #include "stdio.h"
+#include "keypad.h"
+#include "lcd.h"
 
 char bufMsg[17];
-unsigned char bufChar[4];
+char bufChar[4];
 
-float currVol;
-float maxVol;
-float minVol;
-float avgVol;
-float total;
+unsigned short currVol;
+unsigned short maxVol;
+unsigned short minVol;
+unsigned short avgVol;
+unsigned int total;
 unsigned int count;
 
 unsigned short get_A2D();

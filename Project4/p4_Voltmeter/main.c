@@ -15,21 +15,20 @@ int main(void)
 	ini_lcd();
 	ini_meter();
 	unsigned int val = 0;
-	float temp = 0.0;
     while (1) 
     {
-		//start meter
-		if(get_key() == 12){
+		//start meter Key A
+		if(get_key() == 4){
 			while(1){
-				//Reset meter
-				if(get_key() == 16){
+				//Reset meter B
+				if(get_key() == 8){
 					ini_meter();
 					break;
 				}
 				
 				++count;
 				//A2D is 1023 max at 5Volt
-				val = (get_A2D()/ 1024.0 * 5.0);
+				val = ((float)get_A2D()/ 1023.0 * 5.0) * 100;
 				
 				//1st time reading data
 				if(count == 1){
@@ -49,7 +48,7 @@ int main(void)
 				}
 				
 				total += val;
-				avgVol = total/(float)count;
+				avgVol = total/count;
 				
 				displayAvgVol();
 				displayCurrVol();
@@ -64,4 +63,3 @@ int main(void)
 		
     }
 }
-
