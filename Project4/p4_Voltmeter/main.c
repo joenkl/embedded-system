@@ -11,12 +11,13 @@
 
 int main(void)
 {
-	DDRA =0x00;
+	//Set all port A to input
+	DDRA = 0x00;
 	
 	ini_avr();
 	ini_lcd();
 	ini_meter();
-	unsigned short volt;
+	unsigned short volt = 0;
 	while (1)
 	{
 		//start meter Key A
@@ -29,10 +30,8 @@ int main(void)
 				}
 				
 				++count;
-				
-				volt = get_A2D();
 				//A2D is 1023 max at 5Volt
-				volt = ((float)volt/ 1023.0 * 5.0) * 100;
+				volt = ((float)get_A2D()/ 1023.0 * 5.0) * 100;
 				
 				//1st time reading data
 				if(count == 1){
@@ -41,7 +40,6 @@ int main(void)
 				}
 				
 				currVol = volt;
-				
 				//Calculate min
 				if (currVol < minVol){
 					minVol = currVol;
@@ -64,7 +62,5 @@ int main(void)
 				wait_avr(500);
 			}
 		}
-		
-		
 	}
 }

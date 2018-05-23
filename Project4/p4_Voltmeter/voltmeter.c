@@ -24,10 +24,10 @@ void ini_meter(){
 	//Set ADC register
 	//Using AREF port as reference value for voltage
 	//Set ADMUX to REFS0 = Internal Vref turned off and using AREF port
-	SET_BIT(ADMUX, 6);
+	ADMUX |= (1 << REFS0);
 	
 	//Enable ADC
-	//ADEN = ADC Enable
+	//ADEN = ADC Enable - bit7
 	SET_BIT(ADCSRA, 7);
 	
 	//Set default value
@@ -41,11 +41,11 @@ void ini_meter(){
 	clr_lcd();
 	
 	pos_lcd(0,0);
-	sprintf(bufMsg, "Cur:___  Avg:____");
+	sprintf(bufMsg, "Cur:____Avg:____");
 	puts_lcd2(bufMsg);
 	
 	pos_lcd(1,0);
-	sprintf(bufMsg, "Min:___  Max:____");
+	sprintf(bufMsg, "Min:____Max:____");
 	puts_lcd2(bufMsg);
 }
 
@@ -57,15 +57,10 @@ unsigned short get_A2D(){
 	//This bit stays high as long as the conversion is in progress and will be cleared by hardware
 	//when the conversion is completed.
 	//Wait till the ADSC is turned off
-	//while(GET_BIT(ADCSRA, 6));
+	//bit 6
+	while(GET_BIT(ADCSRA, 6));
 	
-	//while(ADCSRA & (1 << ADIF));
-	//ADCSRA |= (1 << ADIF);
-	
-	while(GET_BIT(ADCSRA, 4));
-	CLR_BIT(ADCSRA, 4);
-	
-	return ADC;
+	return ADC;	
 }
 
 void displayCurrVol(){
@@ -76,7 +71,7 @@ void displayCurrVol(){
 
 void displayAvgVol(){
 	sprintf(bufChar, "%d.%02d", avgVol/100, avgVol%100);
-	pos_lcd(0,13);
+	pos_lcd(0,12);
 	puts_lcd2(bufChar);
 }
 
@@ -88,7 +83,7 @@ void displayMinVol(){
 
 void displayMaxVol(){
 	sprintf(bufChar, "%d.%02d", maxVol/100,maxVol%100);
-	pos_lcd(1,13);
+	pos_lcd(1,12);
 	puts_lcd2(bufChar);
 }
 
