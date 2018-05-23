@@ -24,11 +24,11 @@ void ini_meter(){
 	//Set ADC register
 	//Using AREF port as reference value for voltage
 	//Set ADMUX to REFS0 = Internal Vref turned off and using AREF port
-	ADMUX |= (1 << REFS0);
+	SET_BIT(ADMUX, 6);
 	
 	//Enable ADC
 	//ADEN = ADC Enable
-	ADCSRA |= (1 << ADEN);
+	SET_BIT(ADCSRA, 7);
 	
 	//Set default value
 	currVol = 0;
@@ -52,12 +52,18 @@ void ini_meter(){
 unsigned short get_A2D(){
 	//Start Conversion by write 1 to ADSC bit in ADCSRA
 	//ADSC = ADC Start Conversion
-	ADCSRA |= (1 << ADSC);
+	SET_BIT(ADCSRA, 6);
 	
 	//This bit stays high as long as the conversion is in progress and will be cleared by hardware
 	//when the conversion is completed.
 	//Wait till the ADSC is turned off
-	while(ADCSRA & (1 << ADSC));
+	//while(GET_BIT(ADCSRA, 6));
+	
+	//while(ADCSRA & (1 << ADIF));
+	//ADCSRA |= (1 << ADIF);
+	
+	while(GET_BIT(ADCSRA, 4));
+	CLR_BIT(ADCSRA, 4);
 	
 	return ADC;
 }

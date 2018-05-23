@@ -1,7 +1,7 @@
 /*
- * p4_Voltmeter.c
- *
- */ 
+* p4_Voltmeter.c
+*
+*/
 
 #include <avr/io.h>
 #include "avr.h"
@@ -11,12 +11,14 @@
 
 int main(void)
 {
-    ini_avr();
+	DDRA =0x00;
+	
+	ini_avr();
 	ini_lcd();
 	ini_meter();
-	unsigned int val = 0;
-    while (1) 
-    {
+	unsigned short volt;
+	while (1)
+	{
 		//start meter Key A
 		if(get_key() == 4){
 			while(1){
@@ -27,15 +29,18 @@ int main(void)
 				}
 				
 				++count;
+				
+				volt = get_A2D();
 				//A2D is 1023 max at 5Volt
-				val = ((float)get_A2D()/ 1023.0 * 5.0) * 100;
+				volt = ((float)volt/ 1023.0 * 5.0) * 100;
 				
 				//1st time reading data
 				if(count == 1){
-					minVol = val;
-					maxVol = val;
-					currVol = val;
+					minVol = volt;
+					maxVol = volt;
 				}
+				
+				currVol = volt;
 				
 				//Calculate min
 				if (currVol < minVol){
@@ -47,7 +52,7 @@ int main(void)
 					maxVol = currVol;
 				}
 				
-				total += val;
+				total += volt;
 				avgVol = total/count;
 				
 				displayAvgVol();
@@ -61,5 +66,5 @@ int main(void)
 		}
 		
 		
-    }
+	}
 }
