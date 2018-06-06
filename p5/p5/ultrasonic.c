@@ -14,8 +14,8 @@ ISR(TIMER1_OVF_vect){
 void ini_ultrasonic(){
 	//Ultrasonic connection
 	//D6 = echo using ICP port
-	//D7 = trig
-	SET_BIT(DDRD, 7);
+	//D5 = trig
+	SET_BIT(DDRD, 5);
 	CLR_BIT(DDRD, 6);
 }
 
