@@ -47,44 +47,45 @@ B7 - CLK
 #include "LedMatrix.h"
 
 char sad[8] = {
-		0b10000001,
-		0b01000010,
-		0b00100100,
-		0b00011000,
-		0b00011000,
-		0b00100100,
-		0b01000010,
-		0b10000001};
+	0b10000001,
+	0b01000010,
+	0b00100100,
+	0b00011000,
+	0b00011000,
+	0b00100100,
+	0b01000010,
+0b10000001};
 
 char smile01[8] = {
-		0b00001000,
-		0b00010000,
-		0b00100000,
-		0b00100000,
-		0b00100000,
-		0b00100000,
-		0b00010000,
-		0b00001000};
-
-char leftArrow[8] = {
-		0b00011000,
-		0b00100100,
-		0b01011010,
-		0b10011001,
-		0b00011000,
-		0b00011000,
-		0b00011000,
-		0b00011000};
+	0b00001000,
+	0b00010000,
+	0b00100000,
+	0b00100000,
+	0b00100000,
+	0b00100000,
+	0b00010000,
+0b00001000};
 
 char rightArrow[8] = {
-		0b00011000,
-		0b00011000,
-		0b00011000,
-		0b00011000,
-		0b10011001,
-		0b01011010,
-		0b00100100,
-		0b00011000};
+	0b00011000,
+	0b00100100,
+	0b01011010,
+	0b10011001,
+	
+	0b00011000,
+	0b00011000,
+	0b00011000,
+0b00011000};
+
+char leftArrow[8] = {
+	0b00011000,
+	0b00011000,
+	0b00011000,
+	0b00011000,
+	0b10011001,
+	0b01011010,
+	0b00100100,
+0b00011000};
 
 unsigned short horn(float distance)
 {
@@ -142,12 +143,12 @@ int main(void)
 
 		switch (cmd)
 		{
-		case '0':
+			case '0':
 			USART_SendString("\nDistance: ");
 			sprintf(bufC, "%d", (int)(getDistance()));
 			USART_SendString(bufC);
 			break;
-		case '1':
+			case '1':
 			if (horn(getDistance()) == 0)
 			{
 				USART_SendString("\nForward");
@@ -156,23 +157,32 @@ int main(void)
 				stopMotor();
 			}
 			break;
-		case '2':
+			case '2':
 			USART_SendString("\nReverse");
 			goBackward();
 			wait_avr(1000);
 			stopMotor();
 			break;
-		case '3':
+			
+			case '3':
+			image(leftArrow);
+			update_display();
 			turnLeft();
+			image(smile01);
+			update_display();
 			USART_SendString("\nTurn left");
 			break;
 
-		case '4':
+			case '4':
+			image(rightArrow);
+			update_display();
 			turnRight();
+			image(smile01);
+			update_display();
 			USART_SendString("\nTurn right");
 			break;
 
-		case '5': //Slow Down
+			case '5': //Slow Down
 			if (speed < 230)
 			{
 				speed = speed + 25;
@@ -181,7 +191,7 @@ int main(void)
 			USART_SendString(bufC);
 			break;
 
-		case '6': //Speed Up
+			case '6': //Speed Up
 			if (speed > 25)
 			{
 				speed = speed - 25;
@@ -191,7 +201,7 @@ int main(void)
 			motorSpeed(speed);
 			break;
 
-		case '7':
+			case '7':
 			count = 0;
 			for (;;)
 			{
@@ -205,7 +215,20 @@ int main(void)
 
 					stopMotor();
 					wait_avr(250);
-					(rand() % 2) == 0 ? turnLeft() : turnRight();
+					if ((rand() % 2) == 0){
+						image(leftArrow);
+						update_display();
+						turnLeft();
+						image(smile01);
+						update_display();
+						
+						}else{
+						image(rightArrow);
+						update_display();
+						turnRight();
+						image(smile01);
+						update_display();
+					}
 				}
 				sprintf(bufC, "\n%d", count);
 				USART_SendString(bufC);
@@ -217,17 +240,17 @@ int main(void)
 			}
 			break;
 
-		case 'a':
+			case 'a':
 			image(sad);
 			update_display();
 			break;
 
-		case 'b':
+			case 'b':
 			image(smile01);
 			update_display();
 			break;
 
-		default:
+			default:
 			stopMotor();
 			break;
 		}
