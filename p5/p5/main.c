@@ -71,10 +71,20 @@ char smile01[8] = {
 };
 
 unsigned short horn(float distance){
-	if(distance <= 5.0){
+	if(distance <= 10.0){
+		stopMotor();
 		play_note(278, Q);
 		wait_avr(10);
 		play_note(278, Q);
+		
+		if(distance <= 5.0){
+			image(sad);
+			update_display();
+			
+			goBackward();
+			wait_avr(500);
+			stopMotor();
+		}
 		USART_SendString("\nObject Detected");
 		return 1;
 	}
@@ -102,7 +112,7 @@ int main(void)
 	unsigned short speed = 255;
 	unsigned short count;
 	
-	char bufC[10];	
+	char bufC[10];
 	
 	while(1){
 		cmd = USART_RxChar();
@@ -119,18 +129,15 @@ int main(void)
 			{
 				USART_SendString("\nForward");
 				goForward();
-				wait_avr(250);
+				wait_avr(500);
 				stopMotor();
 			}
 			break;
 			case '2':
-			if(horn(getDistance()) == 0)
-			{
-				USART_SendString("\nReverse");
-				goBackward();
-				wait_avr(250);
-				stopMotor();
-			}
+			USART_SendString("\nReverse");
+			goBackward();
+			wait_avr(500);
+			stopMotor();
 			break;
 			case '3':
 			turnLeft();
