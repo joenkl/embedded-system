@@ -71,5 +71,5 @@ void motorSpeed(unsigned int speed){
 		SET_BIT(DDRB, 3);
 		TCCR0 = 0x75;
 		TIMSK = 0x00;
-		OCR0 = 255-speed;
+		OCR0 = (255 - speed);
 }

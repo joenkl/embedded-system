@@ -44,9 +44,6 @@ typedef struct {
 }songs;
 
 void wait_avrMicro(unsigned long microsec);
-void play_song(songs song);
 void play_note(unsigned int freq, float duration);
-void clearBuf();
-void clrLine(unsigned int r);
 
 #endif

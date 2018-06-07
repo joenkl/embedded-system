@@ -148,6 +148,12 @@
     <Compile Include="lcd.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="LedMatrix.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="LedMatrix.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>

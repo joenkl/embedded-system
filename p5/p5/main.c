@@ -16,14 +16,21 @@ C5 - left
 C6 - right
 C7 - right
 
+#buzzer
+C3
+
+#Led Matrix
+B5 - DIN
+B4 - CS
+B7 - CLK
+
 #operation:
 1 - goForward
 2 - goBackward
 3 - turnLeft
 4 - turnRight
-5 - speedUp
-6 - slowDown
-7 - change mode
+5 - slown down
+6 - speed up
 */
 
 #include <avr/io.h>
@@ -37,90 +44,41 @@ C7 - right
 #include "music.h"
 #include "remote.h"
 #include "ultrasonic.h"
+#include "LedMatrix.h"
+
+
+char sad[8] = {
+	0b00010000,
+	0b00001000,
+	0b00000100,
+	0b00000100,
+	0b00000100,
+	0b00000100,
+	0b00001000,
+	0b00010000
+};
+
+
+char smile01[8] = {
+	0b00001100,
+	0b00010100,
+	0b00100100,
+	0b00100100,
+	0b00100100,
+	0b00100100,
+	0b00010100,
+	0b00001100
+};
 
 unsigned short horn(float distance){
 	if(distance <= 5.0){
-		play_note(A, W);
+		play_note(278, Q);
+		wait_avr(10);
+		play_note(278, Q);
+		USART_SendString("\nObject Detected");
 		return 1;
 	}
 	return 0;
-}
-
-void manualMode(){
-	char cmd;
-	unsigned short speed = 0;
-	motorSpeed(speed);
-	
-	while(1){
-		cmd = USART_RxChar();
-		if (cmd == 's'){
-			break;
-		}
-		
-		switch(cmd){
-			case '1':
-			if(horn(getDistance()) == 0)
-			{
-				goForward();
-				wait_avr(250);
-				stopMotor();
-			}
-			break;
-			case '2':
-			if(horn(getDistance()) == 0)
-			{
-				goBackward();
-				wait_avr(250);
-				stopMotor();
-			}
-			break;
-			case '3':
-			turnLeft();
-			break;
-			case '4':
-			turnRight();
-			break;
-			case '5': //speed up
-			if(speed < 220){
-				speed += 25;
-			}
-			motorSpeed(speed);
-			break;
-			case '6': //slow down
-			if (speed > 25){
-				speed -= 25;
-			}
-			motorSpeed(speed);
-			
-			default:
-			stopMotor();
-			break;
-		}
-	}
-}
-
-void autoMode(){
-	char cmd;
-	unsigned short speed = 0;
-	unsigned short num;
-	motorSpeed(speed);
-	
-	while(1){
-		cmd = USART_RxChar();
-		
-		if (cmd == 'c'){
-			break;
-		}
-		
-		if(horn(getDistance()) == 1){
-			stopMotor();
-			num = rand() % 2;
-			
-			num == 0? turnLeft() : turnRight();
-		} else {
-			goForward();
-		}
-	}
 }
 
 int main(void)
@@ -129,31 +87,113 @@ int main(void)
 	ini_motor();
 	ini_ultrasonic();
 	USART_Init(9600);
-	
+	max7219_init();
+
+	image(smile01);
+	update_display();
+
 	//Ultrasonic
 	sei(); //enable global interrupt
 	TIMSK = (1<<TOIE1); //Enable Timer1 overflow interrupt
 	TCCR1A = 0; //Set all bit to zero Normal operation
 	
+
 	char cmd;
-	unsigned short mode = 0; //manual by default
+	unsigned short speed = 255;
+	unsigned short count;
+	
+	char bufC[10];	
 	
 	while(1){
 		cmd = USART_RxChar();
-		
-		if(cmd == '7'){
-			if(mode == 0){
-				mode = 1;
-			} else if (mode == 1){
-				mode = 0;
+		wait_avr(100);
+
+		switch(cmd){
+			case '0':
+			USART_SendString("\nDistance: ");
+			sprintf(bufC,"%d", (int)(getDistance()));
+			USART_SendString(bufC);
+			break;
+			case '1':
+			if(horn(getDistance()) == 0)
+			{
+				USART_SendString("\nForward");
+				goForward();
+				wait_avr(250);
+				stopMotor();
 			}
+			break;
+			case '2':
+			if(horn(getDistance()) == 0)
+			{
+				USART_SendString("\nReverse");
+				goBackward();
+				wait_avr(250);
+				stopMotor();
+			}
+			break;
+			case '3':
+			turnLeft();
+			USART_SendString("\nTurn left");
+			break;
+			
+			case '4':
+			turnRight();
+			USART_SendString("\nTurn right");
+			break;
+			
+			case '5': //Slow Down
+			if(speed < 230){
+				speed = speed + 25;
+			}
+			sprintf(bufC, "Speed: %d", speed);
+			USART_SendString(bufC);
+			break;
+			
+			case '6': //Speed Up
+			if (speed > 25){
+				speed = speed - 25;
+			}
+			sprintf(bufC, "Speed: %d", speed);
+			USART_SendString(bufC);
+			motorSpeed(speed);
+			break;
+			
+			case '7':
+			count = 0;
+			for(;;){
+				++count;
+				if(horn(getDistance()) == 0){
+					goForward();
+					} else{
+					
+					stopMotor();
+					wait_avr(250);
+					(rand() % 2) == 0 ? turnLeft() : turnRight();
+				}
+				sprintf(bufC, "\n%d", count);
+				USART_SendString(bufC);
+
+				if(count > 3000){
+				break;}
+			}
+			break;
+			
+			case 'a':
+			image(sad);
+			update_display();
+			break;
+			
+			case 'b':
+			image(smile01);
+			update_display();
+			break;
+			
+			default:
+			stopMotor();
+			break;
 		}
-		
-		if (mode == 1){
-			autoMode();
-		} 
-		
-		manualMode();
 	}
 }
+
 

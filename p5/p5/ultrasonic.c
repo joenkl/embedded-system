@@ -32,13 +32,13 @@ void wait_us(unsigned long microsec)
 }
 
 
-unsigned int getDistance(){
+float getDistance(){
 	unsigned long count;
 	float distance;
 	
-	SET_BIT(PORTD, 7); //trigger Trig Pin
+	SET_BIT(PORTD, 5); //trigger Trig Pin
 	wait_us(1);	//wait 10us
-	CLR_BIT(PORTD, 7); //clear bit
+	CLR_BIT(PORTD, 5); //clear bit
 	
 	TCNT1 = 0;
 	TCCR1B = 0x41;

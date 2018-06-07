@@ -10,5 +10,5 @@
 
 void ini_ultrasonic();
 void wait_avrMicro(unsigned long microsec);
-unsigned int getDistance();
+float getDistance();
 #endif
