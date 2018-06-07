@@ -36,7 +36,7 @@ B7 - CLK
 #include <avr/io.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "USART_RS232_H_file.h"		/* include USART library */
+#include "USART_RS232_H_file.h" /* include USART library */
 #include "stdio.h"
 #include "avr.h"
 #include "motor.h"
@@ -46,45 +46,64 @@ B7 - CLK
 #include "ultrasonic.h"
 #include "LedMatrix.h"
 
-
 char sad[8] = {
-	0b10000001,
-	0b01000010,
-	0b00100100,
-	0b00011000,
-	0b00011000,
-	0b00100100,
-	0b01000010,
-	0b10000001
-};
-
+		0b10000001,
+		0b01000010,
+		0b00100100,
+		0b00011000,
+		0b00011000,
+		0b00100100,
+		0b01000010,
+		0b10000001};
 
 char smile01[8] = {
-	0b00001000,
-	0b00010000,
-	0b00100000,
-	0b00100000,
-	0b00100000,
-	0b00100000,
-	0b00010000,
-	0b00001000
-};
+		0b00001000,
+		0b00010000,
+		0b00100000,
+		0b00100000,
+		0b00100000,
+		0b00100000,
+		0b00010000,
+		0b00001000};
 
-unsigned short horn(float distance){
-	if(distance <= 15.0){
+char leftArrow[8] = {
+		0b00011000,
+		0b00100100,
+		0b01011010,
+		0b10011001,
+		0b00011000,
+		0b00011000,
+		0b00011000,
+		0b00011000};
+
+char rightArrow[8] = {
+		0b00011000,
+		0b00011000,
+		0b00011000,
+		0b00011000,
+		0b10011001,
+		0b01011010,
+		0b00100100,
+		0b00011000};
+
+unsigned short horn(float distance)
+{
+	if (distance <= 15.0)
+	{
 		stopMotor();
 		play_note(278, Q);
 		wait_avr(10);
 		play_note(278, Q);
-		
-		if(distance <= 10.0){
+
+		if (distance <= 10.0)
+		{
 			image(sad);
 			update_display();
-			
+
 			goBackward();
 			wait_avr(1000);
 			stopMotor();
-			
+
 			image(smile01);
 			update_display();
 		}
@@ -106,29 +125,30 @@ int main(void)
 	update_display();
 
 	//Ultrasonic
-	sei(); //enable global interrupt
-	TIMSK = (1<<TOIE1); //Enable Timer1 overflow interrupt
-	TCCR1A = 0; //Set all bit to zero Normal operation
-	
+	sei();								//enable global interrupt
+	TIMSK = (1 << TOIE1); //Enable Timer1 overflow interrupt
+	TCCR1A = 0;						//Set all bit to zero Normal operation
 
 	char cmd;
 	unsigned short speed = 255;
 	unsigned short count;
-	
+
 	char bufC[10];
-	
-	while(1){
+
+	while (1)
+	{
 		cmd = USART_RxChar();
 		wait_avr(100);
 
-		switch(cmd){
-			case '0':
+		switch (cmd)
+		{
+		case '0':
 			USART_SendString("\nDistance: ");
-			sprintf(bufC,"%d", (int)(getDistance()));
+			sprintf(bufC, "%d", (int)(getDistance()));
 			USART_SendString(bufC);
 			break;
-			case '1':
-			if(horn(getDistance()) == 0)
+		case '1':
+			if (horn(getDistance()) == 0)
 			{
 				USART_SendString("\nForward");
 				goForward();
@@ -136,47 +156,53 @@ int main(void)
 				stopMotor();
 			}
 			break;
-			case '2':
+		case '2':
 			USART_SendString("\nReverse");
 			goBackward();
 			wait_avr(1000);
 			stopMotor();
 			break;
-			case '3':
+		case '3':
 			turnLeft();
 			USART_SendString("\nTurn left");
 			break;
-			
-			case '4':
+
+		case '4':
 			turnRight();
 			USART_SendString("\nTurn right");
 			break;
-			
-			case '5': //Slow Down
-			if(speed < 230){
+
+		case '5': //Slow Down
+			if (speed < 230)
+			{
 				speed = speed + 25;
 			}
 			sprintf(bufC, "Speed: %d", speed);
 			USART_SendString(bufC);
 			break;
-			
-			case '6': //Speed Up
-			if (speed > 25){
+
+		case '6': //Speed Up
+			if (speed > 25)
+			{
 				speed = speed - 25;
 			}
 			sprintf(bufC, "Speed: %d", speed);
 			USART_SendString(bufC);
 			motorSpeed(speed);
 			break;
-			
-			case '7':
+
+		case '7':
 			count = 0;
-			for(;;){
+			for (;;)
+			{
 				++count;
-				if(horn(getDistance()) == 0){
+				if (horn(getDistance()) == 0)
+				{
 					goForward();
-					} else{
-					
+				}
+				else
+				{
+
 					stopMotor();
 					wait_avr(250);
 					(rand() % 2) == 0 ? turnLeft() : turnRight();
@@ -184,26 +210,26 @@ int main(void)
 				sprintf(bufC, "\n%d", count);
 				USART_SendString(bufC);
 
-				if(count > 3000){
-				break;}
+				if (count > 3000)
+				{
+					break;
+				}
 			}
 			break;
-			
-			case 'a':
+
+		case 'a':
 			image(sad);
 			update_display();
 			break;
-			
-			case 'b':
+
+		case 'b':
 			image(smile01);
 			update_display();
 			break;
-			
-			default:
+
+		default:
 			stopMotor();
 			break;
 		}
 	}
 }
-
-
