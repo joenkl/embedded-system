@@ -50,7 +50,7 @@ void turnLeft(){
 	SET_BIT(PORTC, 6);
 	CLR_BIT(PORTC, 7);
 	
-	wait_avr(500);
+	wait_avr(1500);
 	stopMotor();
 }
 
@@ -62,7 +62,7 @@ void turnRight(){
 	SET_BIT(PORTC, 4);
 	CLR_BIT(PORTC, 5);
 	
-	wait_avr(500);
+	wait_avr(1500);
 	stopMotor();
 }
 

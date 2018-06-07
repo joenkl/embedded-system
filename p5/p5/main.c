@@ -48,42 +48,45 @@ B7 - CLK
 
 
 char sad[8] = {
-	0b00010000,
-	0b00001000,
-	0b00000100,
-	0b00000100,
-	0b00000100,
-	0b00000100,
-	0b00001000,
-	0b00010000
+	0b10000001,
+	0b01000010,
+	0b00100100,
+	0b00011000,
+	0b00011000,
+	0b00100100,
+	0b01000010,
+	0b10000001
 };
 
 
 char smile01[8] = {
-	0b00001100,
-	0b00010100,
-	0b00100100,
-	0b00100100,
-	0b00100100,
-	0b00100100,
-	0b00010100,
-	0b00001100
+	0b00001000,
+	0b00010000,
+	0b00100000,
+	0b00100000,
+	0b00100000,
+	0b00100000,
+	0b00010000,
+	0b00001000
 };
 
 unsigned short horn(float distance){
-	if(distance <= 10.0){
+	if(distance <= 15.0){
 		stopMotor();
 		play_note(278, Q);
 		wait_avr(10);
 		play_note(278, Q);
 		
-		if(distance <= 5.0){
+		if(distance <= 10.0){
 			image(sad);
 			update_display();
 			
 			goBackward();
-			wait_avr(500);
+			wait_avr(1000);
 			stopMotor();
+			
+			image(smile01);
+			update_display();
 		}
 		USART_SendString("\nObject Detected");
 		return 1;
@@ -129,14 +132,14 @@ int main(void)
 			{
 				USART_SendString("\nForward");
 				goForward();
-				wait_avr(500);
+				wait_avr(1000);
 				stopMotor();
 			}
 			break;
 			case '2':
 			USART_SendString("\nReverse");
 			goBackward();
-			wait_avr(500);
+			wait_avr(1000);
 			stopMotor();
 			break;
 			case '3':
